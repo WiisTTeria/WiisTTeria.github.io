@@ -17,10 +17,18 @@
     --accent-2:#8b93c4;
     --moon:#bfe6ff;
     --blush:#f2c9dc;
+    /* переливающийся фон страницы */
+    --g1:#090b14;   /* почти чёрный тёмно-синий */
+    --g2:#1c1f2c;   /* тёмное серебро */
+    --g3:#0d1a38;   /* тёмно-синий */
+    --g4:#2b2f3d;   /* тёмное серебро, светлее */
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;padding:24px 16px 60px}
-  .wrap{max-width:1000px;margin:0 auto}
+  body{background:linear-gradient(120deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));background-size:300% 300%;animation:bgshift 28s ease-in-out infinite;min-height:100vh;color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;padding:24px 16px 60px}
+  .wrap{max-width:1000px;margin:0 auto;position:relative;z-index:1}
+  @keyframes bgshift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  /* слой с полумесяцами (за контентом) */
+  #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
   /* ====== Плавное появление снизу вверх ====== */
   .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
@@ -32,11 +40,17 @@
     padding:32px;border-radius:24px;border:1px solid var(--line);
     background:linear-gradient(100deg,#6f78b8 0%,#aab2e0 30%,var(--panel) 75%);
   }
-  /* слева: аватарка, ник, «О себе» */
+  /* слева: аватарка, ник, «ссылка» */
   .profile{display:flex;flex-direction:column;align-items:center;gap:12px;width:170px}
-  .avatar{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--accent);background:var(--panel-2);box-shadow:0 0 18px rgba(159,220,255,.35)}
+  .avatar-wrap{padding:4px;border-radius:50%;line-height:0;
+    background:conic-gradient(from var(--angle),var(--accent-2),var(--moon),var(--blush),var(--accent),var(--accent-2));
+    animation:spin 6s linear infinite;box-shadow:0 0 18px rgba(159,220,255,.35)}
+  .avatar{display:block;width:130px;height:130px;border-radius:50%;object-fit:cover;border:0;background:var(--panel-2)}
   .nick{font-size:1.2rem;font-weight:700}
-  .about-box{width:100%;text-align:center;padding:9px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  .about-box{text-decoration:none;display:block;width:100%;text-align:center;padding:9px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
+    font:inherit;cursor:pointer;transition:border-color .25s,color .25s,background .25s,transform .2s}
+  .about-box:hover{border-color:var(--accent);color:var(--text);background:var(--accent-2)}
+  .about-box:active{transform:scale(.97)}
 
   /* фон шапки: фото или видео (запасной градиент виден, если файла нет) */
   .bg-media{position:absolute;inset:0;z-index:0;display:flex;flex-direction:column;gap:3px;background:var(--bg)}
@@ -80,10 +94,37 @@
   .divider{height:1px;margin:36px 0;background:linear-gradient(90deg,transparent,var(--accent-2),var(--moon),var(--blush),var(--accent),transparent)}
 
   /* ====== 3 окна в ряд ====== */
-  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;min-height:260px;box-shadow:0 0 24px rgba(159,220,255,.12)}
   .card h2{padding:16px 22px;font-size:1.15rem;text-align:center;border-bottom:1px solid var(--line)}
   .card p{padding:18px 22px;text-align:left;color:var(--muted)}
+
+  /* ====== Переливающаяся обводка ====== */
+  @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+  @keyframes spin{to{--angle:360deg}}
+  .card,.modal-box{position:relative}
+  .card::before,.modal-box::before{
+    content:"";position:absolute;inset:-1px;border-radius:inherit;padding:2px;pointer-events:none;
+    background:conic-gradient(from var(--angle),var(--accent-2),var(--moon),var(--blush),var(--accent),var(--accent-2));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;
+    animation:spin 6s linear infinite;
+  }
+
+  /* ====== Окно «О себе» ====== */
+  .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(10,9,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+  .modal.open{opacity:1;visibility:visible}
+  .modal-box{width:min(520px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 0 40px rgba(159,220,255,.2);transform:translateY(24px) scale(.96);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .modal.open .modal-box{transform:none}
+  .modal-content{max-height:80vh;overflow:auto;border-radius:20px}
+  .modal-content h2{padding:16px 56px 16px 22px;font-size:1.15rem;border-bottom:1px solid var(--line)}
+  .modal-content p{padding:18px 22px 22px;color:var(--muted)}
+  .modal-close{position:absolute;top:10px;right:12px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--text);font-size:1.2rem;line-height:1;cursor:pointer;transition:background .2s}
+  .modal-close:hover{background:var(--accent-2)}
 
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   @media(max-width:860px){
@@ -93,10 +134,11 @@
     .header{padding:24px;min-height:360px}
     .music{top:24px;right:24px;--mw:min(240px,calc(100vw - 80px))}
   }
-  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}}
+  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}.avatar-wrap,.card::before,.modal-box::before{animation:none}.modal,.modal-box{transition:none}body{animation:none}}
 </style>
 </head>
 <body>
+<canvas id="sky" aria-hidden="true"></canvas>
 <div class="wrap">
 
   <!-- ===== ШАПКА ===== -->
@@ -108,9 +150,9 @@
       <img src="images/bg2.jpg" alt="" onerror="this.remove()">
     </div>
     <div class="profile">
-      <img class="avatar" src="images/avatar.jpg" alt="Аватарка">
+      <div class="avatar-wrap"><img class="avatar" src="images/avatar.jpg" alt="Аватарка"></div>
       <div class="nick">✧ 𝙬𝙞𝙨𝙩𝙚𝙧𝙞𝙖</div>
-      <div class="about-box">О себе</div>
+      <a class="about-box" href="https://github.com/avvizz?tab=repositories" target="_blank" rel="noopener">Created By avvizz</a>
     </div>
 
     <div class="music" id="music">
@@ -141,18 +183,14 @@
   <main class="cards">
     <section class="card reveal">
       <h2>Название</h2>
-      <p>Здесь будет твой текст. Он выровнен по левому краю.</p>
+      <p>текст</p>
     </section>
     <section class="card reveal">
       <h2>Название</h2>
-      <p>Текст второго окна.</p>
-    </section>
-    <section class="card reveal">
-      <h2>Название</h2>
-      <p>Текст третьего окна.</p>
+      <p>текст</p>
     </section>
   </main>
-  <footer>Created by avvizz</footer>
+  <footer>Ну тут даже бог бессилен</footer>
 </div>
 
 <audio id="audio" preload="auto"></audio>
@@ -225,6 +263,75 @@
   /* Автозапуск: если браузер блокирует звук, музыка начнётся при первом клике по странице */
   play();
   addEventListener('pointerdown', () => { if (audio.paused && audio.currentTime === 0) play(); }, {once:true});
+  /* Окно «О себе»: открыть кнопкой, закрыть крестиком, клавишей Esc или кликом по фону */
+  const about = $('aboutModal'), aboutBtn = $('aboutBtn');
+  function openAbout(){ about.classList.add('open'); document.body.style.overflow='hidden'; $('aboutClose').focus(); }
+  function closeAbout(){ about.classList.remove('open'); document.body.style.overflow=''; aboutBtn.focus(); }
+  aboutBtn.onclick = openAbout;
+  $('aboutClose').onclick = closeAbout;
+  about.onclick = e => { if (e.target === about) closeAbout(); };
+  addEventListener('keydown', e => { if (e.key === 'Escape' && about.classList.contains('open')) closeAbout(); });
+  /* Мерцающие полумесяцы, медленно дрейфующие по экрану */
+  (function(){
+    const cv = $('sky'), ctx = cv.getContext('2d');
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let W, H, dpr, moons = [];
+
+    /* заготовка полумесяца с мягким свечением */
+    function sprite(color, glow){
+      const S = 96, c = document.createElement('canvas'); c.width = c.height = S;
+      const x = c.getContext('2d'), m = document.createElement('canvas'); m.width = m.height = S;
+      const y = m.getContext('2d');
+      y.fillStyle = color; y.beginPath(); y.arc(48,48,26,0,Math.PI*2); y.fill();
+      y.globalCompositeOperation = 'destination-out';
+      y.beginPath(); y.arc(60,42,22,0,Math.PI*2); y.fill();
+      x.shadowColor = glow; x.shadowBlur = 14; x.drawImage(m,0,0);
+      return c;
+    }
+    const sprites = [sprite('#e6e9f7','rgba(230,233,247,.9)'), sprite('#bfe6ff','rgba(143,208,255,.9)')];
+
+    function resize(){
+      dpr = Math.min(devicePixelRatio||1, 2);
+      W = innerWidth; H = innerHeight;
+      cv.width = W*dpr; cv.height = H*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const n = Math.max(18, Math.min(55, Math.round(W*H/38000)));
+      while (moons.length < n) moons.push(spawn());
+      moons.length = n;
+    }
+    function spawn(){
+      const r = Math.random();
+      return {
+        x: Math.random()*W, y: Math.random()*H,
+        size: 8 + Math.random()*18,
+        vx: (Math.random()-.5)*.25, vy: -.05 - Math.random()*.18,
+        rot: Math.random()*Math.PI*2, vr: (Math.random()-.5)*.003,
+        ph: Math.random()*Math.PI*2, sp: .5 + Math.random()*1.2,
+        img: sprites[r < .6 ? 0 : 1], max: .35 + Math.random()*.5
+      };
+    }
+    function draw(t){
+      ctx.clearRect(0,0,W,H);
+      for (const m of moons){
+        if (!still){
+          m.x += m.vx; m.y += m.vy; m.rot += m.vr;
+          const pad = m.size;
+          if (m.x < -pad) m.x = W+pad; else if (m.x > W+pad) m.x = -pad;
+          if (m.y < -pad) m.y = H+pad; else if (m.y > H+pad) m.y = -pad;
+        }
+        const tw = still ? .7 : .5 + .5*Math.sin(t*.001*m.sp + m.ph);
+        ctx.globalAlpha = .12 + m.max*tw;
+        ctx.save();
+        ctx.translate(m.x, m.y); ctx.rotate(m.rot);
+        ctx.drawImage(m.img, -m.size, -m.size, m.size*2, m.size*2);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+      if (!still) requestAnimationFrame(draw);
+    }
+    addEventListener('resize', () => { resize(); if (still) draw(0); });
+    resize(); draw(0);
+  })();
 </script>
 </body>
 </html>
