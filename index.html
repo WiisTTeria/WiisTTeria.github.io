@@ -3,22 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Мой сайт</title>
+<title>✧ 𝙬𝙞𝙨𝙩𝙚𝙧𝙞𝙖 𝙄𝙉𝙁𝙊 ✧</title>
 <style>
-  /* ====== ЦВЕТА — меняй здесь, всё остальное подстроится ====== */
+  /* ====== ЦВЕТА — меняй здесь ====== */
   :root{
-    --bg:#14121f;          /* фон страницы */
-    --panel:#1d1a2e;       /* фон блоков */
-    --panel-2:#26223d;     /* фон внутренних окошек */
-    --line:#3a3560;        /* линии и рамки */
-    --text:#ece9f7;        /* основной текст */
-    --muted:#9d97bd;       /* приглушённый текст */
-    --accent:#ff7ab8;      /* акцент (розовый) */
-    --accent-2:#6c5ce7;    /* второй цвет градиента (фиолетовый) */
+    --bg:#171a2b;
+    --panel:#212539;
+    --panel-2:#2d3249;
+    --line:#6f7898;
+    --text:#f4f6ff;
+    --muted:#b9c0d9;
+    --accent:#e6e9f7;
+    --accent-2:#8b93c4;
+    --moon:#bfe6ff;
+    --blush:#f2c9dc;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;padding:24px 16px 60px}
-  .wrap{max-width:960px;margin:0 auto}
+  .wrap{max-width:1000px;margin:0 auto}
 
   /* ====== Плавное появление снизу вверх ====== */
   .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
@@ -26,61 +28,72 @@
 
   /* ====== Шапка ====== */
   .header{
-    display:flex;justify-content:space-between;align-items:center;gap:24px;
-    padding:36px;border-radius:24px;border:1px solid var(--line);
-    /* градиент слева, справа переходит в цвет панели */
-    background:linear-gradient(100deg,var(--accent-2) 0%,var(--accent) 35%,var(--panel) 75%);
-    min-height:300px;
+    position:relative;overflow:hidden;min-height:340px;display:flex;align-items:flex-start;
+    padding:32px;border-radius:24px;border:1px solid var(--line);
+    background:linear-gradient(100deg,#6f78b8 0%,#aab2e0 30%,var(--panel) 75%);
   }
-  .profile{display:flex;flex-direction:column;align-items:center;gap:12px;width:220px;flex-shrink:0}
-  .avatar{width:140px;height:140px;border-radius:50%;object-fit:cover;border:4px solid var(--text);background:var(--panel-2)}
-  .nick{font-size:1.3rem;font-weight:700}
-  .about-box{width:100%;text-align:center;padding:10px 16px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  /* слева: аватарка, ник, «О себе» */
+  .profile{display:flex;flex-direction:column;align-items:center;gap:12px;width:170px}
+  .avatar{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--accent);background:var(--panel-2);box-shadow:0 0 18px rgba(159,220,255,.35)}
+  .nick{font-size:1.2rem;font-weight:700}
+  .about-box{width:100%;text-align:center;padding:9px 14px;border-radius:14px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
 
-  /* ====== Музыкальная кнопка / плеер ====== */
-  .music-slot{height:140px;display:flex;align-items:center}   /* та же высота, что и у аватарки */
+  /* фон шапки: фото или видео (запасной градиент виден, если файла нет) */
+  .bg-media{position:absolute;inset:0;z-index:0;display:flex;flex-direction:column;gap:3px;background:var(--bg)}
+  .bg-media img,.bg-media video{width:100%;flex:1;min-height:0;object-fit:cover;display:block}
+  .bg-media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(21,18,46,.65),rgba(21,18,46,.15) 60%,rgba(21,18,46,.35))}
+  .profile{position:relative;z-index:1}
+
+  /* справа: кнопка музыки (раскрывается влево) */
   .music{
-    position:relative;width:56px;height:56px;border-radius:28px;overflow:hidden;
+    position:absolute;top:32px;right:32px;z-index:5;
+    --mw:240px;width:var(--mw);height:56px;border-radius:28px;overflow:hidden;cursor:pointer;
     background:var(--panel);border:1px solid var(--line);
     transition:width .5s cubic-bezier(.7,0,.2,1),height .5s cubic-bezier(.7,0,.2,1),border-radius .5s;
   }
-  .music.open{width:min(320px,100%);height:210px;border-radius:20px}
-  .music-btn{position:absolute;top:0;left:0;width:54px;height:54px;border:0;background:none;color:var(--accent);font-size:1.5rem;cursor:pointer;z-index:2}
+  .music.open{width:min(320px,calc(100vw - 64px));height:210px;border-radius:20px;cursor:default}
+  /* бегущая строка в закрытой плашке */
+  .marq{position:absolute;left:20px;top:0;width:calc(var(--mw) - 76px);height:54px;display:flex;align-items:center;overflow:hidden;
+    font-size:.9rem;font-weight:600;transition:opacity .25s;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+  .marq span{display:inline-block;white-space:nowrap}
+  .marq span.scroll{animation:marq linear infinite}
+  .marq span.scroll:hover{animation-play-state:paused}
+  @keyframes marq{to{transform:translateX(-50%)}}
+  .music.open .marq{opacity:0;pointer-events:none}
+  .music-btn{position:absolute;top:0;right:0;width:54px;height:54px;border:0;background:none;color:var(--accent);font-size:1.5rem;cursor:pointer;z-index:2}
   .music-body{padding:16px 16px 14px;opacity:0;transition:opacity .3s;pointer-events:none}
   .music.open .music-body{opacity:1;pointer-events:auto;transition-delay:.3s}
-  .track{display:flex;gap:12px;align-items:center;margin-left:44px;margin-bottom:14px;min-height:56px}
+  .track{display:flex;gap:12px;align-items:center;margin-right:44px;margin-bottom:14px;min-height:56px}
   .cover{width:56px;height:56px;border-radius:10px;flex-shrink:0;object-fit:cover;background:linear-gradient(135deg,var(--accent-2),var(--accent))}
   .t-title{font-weight:700;font-size:.95rem}
   .t-artist{color:var(--muted);font-size:.85rem}
   .bar{height:6px;border-radius:3px;background:var(--panel-2);cursor:pointer;overflow:hidden}
-  .bar i{display:block;height:100%;width:0;background:var(--accent)}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--blush),var(--moon))}
   .time{display:flex;justify-content:space-between;color:var(--muted);font-size:.75rem;margin:6px 0 8px}
   .ctrl{display:flex;justify-content:center;gap:14px}
   .ctrl button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:1rem;cursor:pointer;transition:background .2s}
   .ctrl button:hover{background:var(--accent-2)}
-  .ctrl .play{background:var(--accent);color:#1a1020;border-color:var(--accent)}
+  .ctrl .play{background:var(--accent);color:#15122e;border-color:var(--accent)}
 
   /* ====== Разделитель ====== */
-  .divider{height:1px;margin:36px 0;background:linear-gradient(90deg,transparent,var(--accent),var(--accent-2),transparent)}
+  .divider{height:1px;margin:36px 0;background:linear-gradient(90deg,transparent,var(--accent-2),var(--moon),var(--blush),var(--accent),transparent)}
 
-  /* ====== Основная часть: 3 окна ====== */
-  .cards{display:grid;gap:24px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column}
-  .card h2{padding:18px 24px;font-size:1.2rem;border-bottom:1px solid var(--line)}
-  .card-body{padding:20px 24px 20px;display:flex;flex-direction:column;gap:20px;flex:1}
-  .card-body p{text-align:left;color:var(--muted)}
-  .card-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:auto}
-  .btn{padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:.9rem;cursor:pointer;transition:background .2s}
-  .btn:hover{background:var(--accent-2)}
-  .btn.main{background:var(--accent);border-color:var(--accent);color:#1a1020;font-weight:600}
-  .btn.main:hover{background:var(--text)}
+  /* ====== 3 окна в ряд ====== */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;min-height:260px;box-shadow:0 0 24px rgba(159,220,255,.12)}
+  .card h2{padding:16px 22px;font-size:1.15rem;text-align:center;border-bottom:1px solid var(--line)}
+  .card p{padding:18px 22px;text-align:left;color:var(--muted)}
 
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  @media(max-width:700px){
-    .header{flex-direction:column-reverse;padding:24px}
-    .music-slot{height:auto;width:100%;justify-content:center}
+  @media(max-width:860px){
+    .cards{grid-template-columns:1fr}
   }
-  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}}
+  @media(max-width:700px){
+    .header{padding:24px;min-height:360px}
+    .music{top:24px;right:24px;--mw:min(240px,calc(100vw - 80px))}
+  }
+  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}}
 </style>
 </head>
 <body>
@@ -88,32 +101,37 @@
 
   <!-- ===== ШАПКА ===== -->
   <header class="header reveal">
-    <div class="music-slot">
-      <div class="music" id="music">
-        <button class="music-btn" id="musicBtn" aria-label="Открыть плеер">♫</button>
-        <div class="music-body">
-          <div class="track">
-            <img class="cover" id="cover" alt="" src="">
-            <div>
-              <div class="t-title" id="title">Название</div>
-              <div class="t-artist" id="artist">Исполнитель</div>
-            </div>
-          </div>
-          <div class="bar" id="bar"><i id="fill"></i></div>
-          <div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
-          <div class="ctrl">
-            <button id="prev" aria-label="Назад">⏮</button>
-            <button id="play" class="play" aria-label="Играть">▶</button>
-            <button id="next" aria-label="Вперёд">⏭</button>
-          </div>
-        </div>
-      </div>
+    <!-- ФОН ШАПКИ. Для видео замени <img> на:
+         <video src="images/bg.mp4" autoplay muted loop playsinline></video> -->
+    <div class="bg-media">
+      <img src="images/bg1.jpg" alt="" onerror="this.remove()">
+      <img src="images/bg2.jpg" alt="" onerror="this.remove()">
     </div>
-
     <div class="profile">
       <img class="avatar" src="images/avatar.jpg" alt="Аватарка">
-      <div class="nick">Твой ник</div>
+      <div class="nick">✧ 𝙬𝙞𝙨𝙩𝙚𝙧𝙞𝙖</div>
       <div class="about-box">О себе</div>
+    </div>
+
+    <div class="music" id="music">
+      <div class="marq" id="marq"><span id="marqText"></span></div>
+      <button class="music-btn" id="musicBtn" aria-label="Открыть плеер">♫</button>
+      <div class="music-body">
+        <div class="track">
+          <img class="cover" id="cover" alt="" src="">
+          <div>
+            <div class="t-title" id="title">Название</div>
+            <div class="t-artist" id="artist">Исполнитель</div>
+          </div>
+        </div>
+        <div class="bar" id="bar"><i id="fill"></i></div>
+        <div class="time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+        <div class="ctrl">
+          <button id="prev" aria-label="Назад">⏮</button>
+          <button id="play" class="play" aria-label="Играть">▶</button>
+          <button id="next" aria-label="Вперёд">⏭</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -122,51 +140,41 @@
   <!-- ===== ОСНОВНАЯ ЧАСТЬ ===== -->
   <main class="cards">
     <section class="card reveal">
-      <h2>Первое окно</h2>
-      <div class="card-body">
-        <p>Здесь будет твой текст. Он выровнен по левому краю, а кнопки находятся в правом нижнем углу окна.</p>
-        <div class="card-actions"><button class="btn">Кнопка</button><button class="btn main">Подробнее</button></div>
-      </div>
+      <h2>Название</h2>
+      <p>Здесь будет твой текст. Он выровнен по левому краю.</p>
     </section>
-
     <section class="card reveal">
-      <h2>Второе окно</h2>
-      <div class="card-body">
-        <p>Это второе окно. Замени название и текст на свои.</p>
-        <div class="card-actions"><button class="btn">Кнопка</button><button class="btn main">Подробнее</button></div>
-      </div>
+      <h2>Название</h2>
+      <p>Текст второго окна.</p>
     </section>
-
     <section class="card reveal">
-      <h2>Третье окно</h2>
-      <div class="card-body">
-        <p>Это третье окно. Можно писать сколько угодно текста — кнопки всегда останутся внизу справа.</p>
-        <div class="card-actions"><button class="btn">Кнопка</button><button class="btn main">Подробнее</button></div>
-      </div>
+      <h2>Название</h2>
+      <p>Текст третьего окна.</p>
     </section>
   </main>
+  <footer>Created by avvizz</footer>
 </div>
 
 <audio id="audio" preload="auto"></audio>
 
 <script>
-  /* ====== Плавное появление при прокрутке ====== */
+  /* Плавное появление при прокрутке */
   const io = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting){ e.target.classList.add('show'); io.unobserve(e.target); }
   }), {threshold:.12});
   document.querySelectorAll('.reveal').forEach((el,i) => { el.style.transitionDelay = (i*0.12)+'s'; io.observe(el); });
 
-  /* ====== СПИСОК ТРЕКОВ — меняй под себя ======
-     Файлы кладёшь в папку music/ и images/ в репозитории */
+  /* СПИСОК ТРЕКОВ — меняй под себя */
   const tracks = [
-    {title:'Первый трек',  artist:'Исполнитель 1', src:'music/track1.mp3', cover:'images/cover1.jpg'},
-    {title:'Второй трек',  artist:'Исполнитель 2', src:'music/track2.mp3', cover:'images/cover2.jpg'},
-    {title:'Третий трек',  artist:'Исполнитель 3', src:'music/track3.mp3', cover:'images/cover3.jpg'}
+    {title:'Шаткая крыша', artist:'Mauko', src:'music/track1.mp3', cover:'images/cover1.jpg'},
+    {title:'Тамагочи', artist:'zhanulka', src:'music/track2.mp3', cover:'images/cover2.jpg'},
+    {title:'I Wanna Be Yours', artist:'Arctic Monkeys', src:'music/track3.mp3', cover:'images/cover3.jpg'},
+	{title:'505', artist:'Arctic Monkeys', src:'music/track4.mp3', cover:'images/cover4.jpg'}
   ];
 
   const $ = id => document.getElementById(id);
   const audio = $('audio'), music = $('music');
-  let i = Math.floor(Math.random()*tracks.length);   // случайный трек при каждом заходе
+  let i = 0
 
   const fmt = s => isFinite(s) ? Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0') : '0:00';
 
@@ -177,11 +185,27 @@
     $('title').textContent = t.title;
     $('artist').textContent = t.artist;
     $('cover').src = t.cover;
+    setMarq();
   }
+  /* Название в плашке: если не влезает — прокручивается вместе с исполнителем */
+  function setMarq(){
+    const el = $('marqText'), box = $('marq'), t = tracks[i].title+' — '+tracks[i].artist;
+    el.classList.remove('scroll');
+    el.textContent = t;
+    if (el.offsetWidth > box.clientWidth){
+      const part = t+'      •      ';
+      el.textContent = part+part;
+      el.style.animationDuration = (t.length*0.3+5)+'s';
+      el.classList.add('scroll');
+    }
+  }
+  addEventListener('resize', setMarq);
+  addEventListener('load', setMarq);
   function play(){ return audio.play().then(()=>{$('play').textContent='❚❚'}).catch(()=>{$('play').textContent='▶'}); }
   function toggle(){ audio.paused ? play() : (audio.pause(), $('play').textContent='▶'); }
 
-  $('musicBtn').onclick = () => music.classList.toggle('open');
+  music.onclick = () => music.classList.add('open');            // клик по плашке — раскрыть
+  $('musicBtn').onclick = e => { e.stopPropagation(); music.classList.toggle('open'); };  // значок — раскрыть/свернуть
   $('play').onclick = toggle;
   $('next').onclick = () => { load(i+1); play(); };
   $('prev').onclick = () => { load(i-1); play(); };
@@ -198,15 +222,9 @@
   $('cover').onerror = e => e.target.removeAttribute('src');
 
   load(i);
-  /* Автозапуск. Браузеры часто блокируют звук без действия пользователя —
-     тогда музыка начнётся при первом клике или касании по странице. */
-  play().then(() => {
-    if (audio.paused){
-      const start = () => { play(); };
-      addEventListener('pointerdown', start, {once:true});
-    }
-  });
-  addEventListener('pointerdown', () => { if (audio.paused && !audio.dataset.stopped) play(); }, {once:true});
+  /* Автозапуск: если браузер блокирует звук, музыка начнётся при первом клике по странице */
+  play();
+  addEventListener('pointerdown', () => { if (audio.paused && audio.currentTime === 0) play(); }, {once:true});
 </script>
 </body>
 </html>
