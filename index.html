@@ -274,7 +274,14 @@
   load(i);
   /* Автозапуск: если браузер блокирует звук, музыка начнётся при первом клике по странице */
   play();
-  addEventListener('pointerdown', () => { if (audio.paused && audio.currentTime === 0) play(); }, {once:true});
+ /* Если браузер заблокировал автозапуск, музыка включится при первом настоящем касании */
+const unlock = () => {
+  if (!audio.paused) return cleanup();
+  audio.play().then(() => { $('play').textContent = '❚❚'; cleanup(); }).catch(() => {});
+};
+const evs = ['click', 'touchend', 'keydown'];
+const cleanup = () => evs.forEach(e => removeEventListener(e, unlock));
+evs.forEach(e => addEventListener(e, unlock));
   /* Окно «О себе»: открыть кнопкой, закрыть крестиком, клавишей Esc или кликом по фону */
   const about = $('aboutModal'), aboutBtn = $('aboutBtn');
   function openAbout(){ about.classList.add('open'); document.body.style.overflow='hidden'; $('aboutClose').focus(); }
