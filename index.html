@@ -40,7 +40,7 @@
     padding:32px;border-radius:24px;border:1px solid var(--line);
     background:linear-gradient(100deg,#6f78b8 0%,#aab2e0 30%,var(--panel) 75%);
   }
-  /* слева: аватарка, ник, «ссылка» */
+  /* слева: аватарка, ник, «О себе» */
   .profile{display:flex;flex-direction:column;align-items:center;gap:12px;width:170px}
   .avatar-wrap{padding:4px;border-radius:50%;line-height:0;
     background:conic-gradient(from var(--angle),var(--accent-2),var(--moon),var(--blush),var(--accent),var(--accent-2));
@@ -183,14 +183,25 @@
   <main class="cards">
     <section class="card reveal">
       <h2>Название</h2>
-      <p>текст</p>
+      <p>Здесь будет твой текст. Он выровнен по левому краю.</p>
     </section>
     <section class="card reveal">
       <h2>Название</h2>
-      <p>текст</p>
+      <p>Текст второго окна.</p>
     </section>
   </main>
   <footer>Ну тут даже бог бессилен</footer>
+</div>
+
+<!-- ===== ОКНО «О СЕБЕ» ===== -->
+<div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="modal-box">
+    <button class="modal-close" id="aboutClose" type="button" aria-label="Закрыть">✕</button>
+    <div class="modal-content">
+      <h2 id="aboutTitle">О себе</h2>
+      <p>Здесь будет текст о тебе. Замени его на свой.</p>
+    </div>
+  </div>
 </div>
 
 <audio id="audio" preload="auto"></audio>
@@ -267,7 +278,7 @@
   const about = $('aboutModal'), aboutBtn = $('aboutBtn');
   function openAbout(){ about.classList.add('open'); document.body.style.overflow='hidden'; $('aboutClose').focus(); }
   function closeAbout(){ about.classList.remove('open'); document.body.style.overflow=''; aboutBtn.focus(); }
-  aboutBtn.onclick = openAbout;
+  if (aboutBtn) aboutBtn.onclick = openAbout;
   $('aboutClose').onclick = closeAbout;
   about.onclick = e => { if (e.target === about) closeAbout(); };
   addEventListener('keydown', e => { if (e.key === 'Escape' && about.classList.contains('open')) closeAbout(); });
