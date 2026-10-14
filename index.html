@@ -131,9 +131,10 @@
     .cards{grid-template-columns:1fr}
   }
   @media(max-width:700px){
-    .header{padding:24px;min-height:360px}
-    .music{top:24px;right:24px;--mw:min(240px,calc(100vw - 80px))}
-  }
+  .header{padding:24px;min-height:0;flex-direction:column;align-items:center;gap:20px}
+  .music{position:relative;top:auto;right:auto;--mw:100%;width:100%;max-width:340px}
+  .music.open{width:100%;max-width:340px}
+}
   @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}.avatar-wrap,.card::before,.modal-box::before{animation:none}.modal,.modal-box{transition:none}body{animation:none}}
 </style>
 </head>
