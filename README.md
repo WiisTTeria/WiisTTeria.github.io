@@ -1,2 +1,2 @@
 MY FIRST INFO SITE,
-MAIN CODER awizz
+MAIN CODER avvizz
