@@ -24,11 +24,16 @@
     --g4:#2b2f3d;   /* тёмное серебро, светлее */
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:linear-gradient(120deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));background-size:300% 300%;animation:bgshift 28s ease-in-out infinite;min-height:100vh;color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;padding:24px 16px 60px}
+  body{background:linear-gradient(120deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));background-size:300% 300%;animation:bgshift 28s ease-in-out infinite;min-height:100vh;color:var(--text);font-family:"Segoe UI",Roboto,Arial,Sans-serif;line-height:1.55;padding:24px 16px 60px}
   .wrap{max-width:1000px;margin:0 auto;position:relative;z-index:1}
   @keyframes bgshift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
   /* слой с полумесяцами (за контентом) */
   #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  /* слой со снегом (поверх контента, клики пропускает) */
+  #snow{position:fixed;inset:0;width:100%;height:100%;z-index:50;pointer-events:none}
+
+  /* ====== Подпись внизу: по центру, тусклая ====== */
+  footer{margin-top:44px;text-align:center;color:var(--muted);opacity:.4;font-size:.9rem;letter-spacing:.04em}
 
   /* ====== Плавное появление снизу вверх ====== */
   .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
@@ -94,10 +99,28 @@
   .divider{height:1px;margin:36px 0;background:linear-gradient(90deg,transparent,var(--accent-2),var(--moon),var(--blush),var(--accent),transparent)}
 
   /* ====== 3 окна в ряд ====== */
-  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+  .cards{display:block}
+  .cards > *{margin-bottom:30px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;min-height:260px;box-shadow:0 0 24px rgba(159,220,255,.12)}
   .card h2{padding:16px 22px;font-size:1.15rem;text-align:center;border-bottom:1px solid var(--line)}
   .card p{padding:18px 22px;text-align:left;color:var(--muted)}
+  /* ====== Favorite Artists: плашки-ссылки внутри карточки ====== */
+  .artists{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;padding:20px 22px 24px}
+  .musiccard{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 16px;border-radius:14px;
+    background:var(--panel-2);border:1px solid var(--line);
+    color:var(--text);text-decoration:none;font-weight:600;font-size:.95rem;
+    cursor:pointer;user-select:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    transition:transform .2s,background .25s,border-color .25s,box-shadow .25s,color .25s;
+  }
+  .musiccard::before{content:"✧";color:var(--accent-2);transition:color .25s,transform .4s}
+  .musiccard:hover{
+    background:var(--accent-2);border-color:var(--accent);
+    transform:translateY(-3px);box-shadow:0 6px 22px rgba(159,220,255,.25);
+  }
+  .musiccard:hover::before{color:var(--text);transform:rotate(180deg)}
+  .musiccard:active{transform:translateY(-1px) scale(.98)}
 
   /* ====== Переливающаяся обводка ====== */
   @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
@@ -111,7 +134,7 @@
     animation:spin 6s linear infinite;
   }
 
-  /* ====== Окно «О себе» ====== */
+  /* ====== Окно под ником ====== */
   .modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
     background:rgba(10,9,24,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
     opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
@@ -121,7 +144,8 @@
   .modal.open .modal-box{transform:none}
   .modal-content{max-height:80vh;overflow:auto;border-radius:20px}
   .modal-content h2{padding:16px 56px 16px 22px;font-size:1.15rem;border-bottom:1px solid var(--line)}
-  .modal-content p{padding:18px 22px 22px;color:var(--muted)}
+  .modal-content p{padding:18px 22px 0;color:var(--muted)}
+  #artistText{padding-bottom:22px}
   .modal-close{position:absolute;top:10px;right:12px;z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
     background:var(--panel-2);color:var(--text);font-size:1.2rem;line-height:1;cursor:pointer;transition:background .2s}
   .modal-close:hover{background:var(--accent-2)}
@@ -131,15 +155,16 @@
     .cards{grid-template-columns:1fr}
   }
   @media(max-width:700px){
-  .header{padding:24px;min-height:0;flex-direction:column;align-items:center;gap:20px}
-  .music{position:relative;top:auto;right:auto;--mw:100%;width:100%;max-width:340px}
-  .music.open{width:100%;max-width:340px}
-}
-  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}.avatar-wrap,.card::before,.modal-box::before{animation:none}.modal,.modal-box{transition:none}body{animation:none}}
+    .header{padding:24px;min-height:0;flex-direction:column;align-items:center;gap:20px}
+    .music{position:relative;top:auto;right:auto;--mw:100%;width:100%;max-width:340px}
+    .music.open{width:100%;max-width:340px}
+  }
+  @media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}.marq span.scroll{animation:none}.avatar-wrap,.card::before,.modal-box::before{animation:none}.modal,.modal-box{transition:none}body{animation:none}#snow{display:none}}
 </style>
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
+<canvas id="snow" aria-hidden="true"></canvas>
 <div class="wrap">
 
   <!-- ===== ШАПКА ===== -->
@@ -153,7 +178,7 @@
     <div class="profile">
       <div class="avatar-wrap"><img class="avatar" src="images/avatar.jpg" alt="Аватарка"></div>
       <div class="nick">✧ 𝙬𝙞𝙨𝙩𝙚𝙧𝙞𝙖</div>
-      <a class="about-box" href="https://github.com/avvizz?tab=repositories" target="_blank" rel="noopener">Created By avvizz</a>
+      <a class="about-box" href="https://github.com/avvizz?tab=repositories" target="_blank" rel="noopener">𝘾𝙧𝙚𝙖𝙩𝙚𝙙 𝘽𝙮 𝙖𝙬𝙞𝙯𝙯</a>
     </div>
 
     <div class="music" id="music">
@@ -183,24 +208,50 @@
   <!-- ===== ОСНОВНАЯ ЧАСТЬ ===== -->
   <main class="cards">
     <section class="card reveal">
-      <h2>Название</h2>
-      <p>Здесь будет твой текст. Он выровнен по левому краю.</p>
+      <h2>𝙑𝙚𝙡𝙡𝙞𝙘𝙝𝙤𝙧 𝙉𝙞𝙜𝙝𝙩𝙨</h2>
+      <p>Крыша шатается. Луна всё видит.</p>
+	  <p>Это не дом. Это место, которое ещё не рухнуло — и уже не ждёт, что устоит.</p>
+	  <p>Здесь не здороваются. Здесь просто сидят на краю, свесив ноги в пустоту, и смотрят, как внизу кто-то ходит туда-сюда, будто у них есть куда идти. Люди и луна устроены одинаково — издалека светят, вблизи — одни ямы.</p>
+	  <p>Пахнет морозным месяцем и мятой, которую кто-то жевал, чтобы не закричать. Письма, которые не отправили. Окна, которые не открываются, но всё равно сквозит.</p>
     </section>
     <section class="card reveal">
-      <h2>Название</h2>
-      <p>Текст второго окна.</p>
+      <h2>𝘽𝙤𝙧𝙙𝙚𝙧𝙡𝙞𝙣𝙚 𝙋𝙚𝙧𝙨𝙤𝙣𝙖𝙡𝙞𝙩𝙮 𝘿𝙞𝙨𝙤𝙧𝙙𝙚𝙧</h2>
+      <p>Это не характер. Это — шаткая крыша, которая никогда не перестаёт скрипеть.</p>
+      <p>Человек с ПРЛ не притворяется. Просто у него нет кожи. Всё, что для других — сквозняк, для него — нож. Ты нужен — до растворения. Ты ушёл на десять минут — ты умер. Нет середины. Нет «нормально». Есть только «всё» и «ничего».</p>
+      <p>«А я тебя вижу — дальше, ближе.»</p>
     </section>
+	<section class="card reveal">
+      <h2>𝙈𝘽𝙏𝙄</h2>
+      <p>INTP — один из 16 типов личности по типологии MBTI (Myers-Briggs Type Indicator). Аббревиатура расшифровывается как интроверсия (I), интуиция (N), мышление (T) и восприятие (P).</p>
+	  <p>Такой человек черпает энергию в уединении, ориентируется на идеи, возможности и закономерности, принимает решения через логику и объективный анализ, а в жизни предпочитает гибкость и открытость строгому плану.</p>
+	  <p>Типичные черты INTP — любовь к анализу и построению теорий, ценность логики выше эмоций и социальных условностей, независимость, нелюбовь к рутине и внешнему контролю, богатый внутренний мир при внешней отстранённости, склонность больше размышлять, чем действовать, и слабое внешнее выражение эмоций при глубоких переживаниях.</p>
+	  <p>Сильные стороны — оригинальность, глубина анализа, честность, способность видеть неочевидное; слабые — прокрастинация, трудности с бытовыми делами, избегание конфликтов, сложности с эмоциональной близостью.</p>
+	  <p>Важно: MBTI не является научным диагностическим инструментом, это популярная типология, а не клиническая классификация, и тип личности не определяет судьбу.</p>
+	</section>
+	<section class="card reveal">
+	<h2>𝙁𝙖𝙫𝙤𝙧𝙞𝙩𝙚 𝘼𝙧𝙩𝙞𝙨𝙩𝙨</h2>
+	<div class="artists">
+	  <a class="musiccard" data-artist="artist1" role="button" tabindex="0">CUPSIZE</a>
+	  <a class="musiccard" data-artist="artist2" role="button" tabindex="0">Pastel Goth</a>
+	  <a class="musiccard" data-artist="artist3" role="button" tabindex="0">The Cranberries</a>
+	  <a class="musiccard" data-artist="artist4" role="button" tabindex="0">лампабикт</a>
+	  <a class="musiccard" data-artist="artist5" role="button" tabindex="0">Город312</a>
+	  <a class="musiccard" data-artist="artist6" role="button" tabindex="0">Arctic Monkeys</a>
+	</div>
+	</section>
   </main>
-  <footer>Ну тут даже бог бессилен</footer>
+  <footer><p>Ну тут даже бог бессилен</p>
+  </footer>
 </div>
 
-<!-- ===== ОКНО «О СЕБЕ» ===== -->
-<div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+
+<!-- ===== ОКНО ИСПОЛНИТЕЛЯ ===== -->
+<div class="modal" id="artistModal" role="dialog" aria-modal="true" aria-labelledby="artistTitle">
   <div class="modal-box">
-    <button class="modal-close" id="aboutClose" type="button" aria-label="Закрыть">✕</button>
+    <button class="modal-close" id="artistClose" type="button" aria-label="Закрыть">✕</button>
     <div class="modal-content">
-      <h2 id="aboutTitle">О себе</h2>
-      <p>Здесь будет текст о тебе. Замени его на свой.</p>
+      <h2 id="artistTitle"></h2>
+      <div id="artistText"></div>
     </div>
   </div>
 </div>
@@ -274,22 +325,60 @@
   load(i);
   /* Автозапуск: если браузер блокирует звук, музыка начнётся при первом клике по странице */
   play();
- /* Если браузер заблокировал автозапуск, музыка включится при первом настоящем касании */
-const unlock = () => {
-  if (!audio.paused) return cleanup();
-  audio.play().then(() => { $('play').textContent = '❚❚'; cleanup(); }).catch(() => {});
-};
-const evs = ['click', 'touchend', 'keydown'];
-const cleanup = () => evs.forEach(e => removeEventListener(e, unlock));
-evs.forEach(e => addEventListener(e, unlock));
-  /* Окно «О себе»: открыть кнопкой, закрыть крестиком, клавишей Esc или кликом по фону */
-  const about = $('aboutModal'), aboutBtn = $('aboutBtn');
-  function openAbout(){ about.classList.add('open'); document.body.style.overflow='hidden'; $('aboutClose').focus(); }
-  function closeAbout(){ about.classList.remove('open'); document.body.style.overflow=''; aboutBtn.focus(); }
-  if (aboutBtn) aboutBtn.onclick = openAbout;
-  $('aboutClose').onclick = closeAbout;
-  about.onclick = e => { if (e.target === about) closeAbout(); };
-  addEventListener('keydown', e => { if (e.key === 'Escape' && about.classList.contains('open')) closeAbout(); });
+  /* Если браузер заблокировал автозапуск, музыка включится при первом настоящем касании */
+  const unlock = () => {
+    if (!audio.paused) return cleanup();
+    audio.play().then(() => { $('play').textContent = '❚❚'; cleanup(); }).catch(() => {});
+  };
+  const evs = ['click', 'touchend', 'keydown'];
+  const cleanup = () => evs.forEach(e => removeEventListener(e, unlock));
+  evs.forEach(e => addEventListener(e, unlock));
+  /* ===== ОКНО ИСПОЛНИТЕЛЯ ===== */
+  /* Тексты для окон: ключ = data-artist у плашки, значение = абзацы текста */
+  const artistInfo = {
+    artist1: [
+      'Музыкальный стиль: инди-поп/бедрум-поп с лоу-фай звучанием, мечтательным вокалом и лёгкой гитарной нежностью. Музыка уютная, немного меланхоличная, с эстетикой «спальни».'
+    ],
+    artist2: [
+      'Музыкальный стиль: тёмный синти-поп/дрим-поп с готической мрачностью, но в «пастельной» мягкой подаче. Атмосферные синтезаторы, меланхоличный вайб и эстетика ночной нежности.'
+    ],
+    artist3: [
+      'Музыкальный стиль: ирландская альтернативная рок-группа 90-х. Фирменные черты: гитарный джангл-поп, пронзительный вокал Долорес О Риордан с йодлем и кельтскими нотками, сочетание нежности и протестной лирики.'
+    ],
+	artist4: [
+      'Музыкальный стиль: российская инди-группа с постпанк- и эмо-влиянием, эмоциональные тексты на русском, гитарный и местами танцевальный драйв, живая, искренняя подача.'
+    ],
+	artist5: [
+      'Музыкальный стиль: русский поп-рок/инди-поп 2000-х. Мелодичные, лиричные песни о любви и расставаниях, лёгкий гитарный саунд, узнаваемый вокал Влади, настроение светлой грусти.'
+    ],
+	artist6: [
+      'Музыкальный стиль: британская рок-группа из Шеффилда. Начинали с энергичного гаражного рока и инди, позже перешли к стоунер-року, а затем к лаунж-эксперименту. Узнаваемы по острым текстам и харизматичному вокалу Алекса Тёрнера.'
+    ]
+  };
+
+  const aModal = $('artistModal'), aTitle = $('artistTitle'), aText = $('artistText');
+  let lastChip = null;
+  function openArtist(chip){
+    const paras = artistInfo[chip.dataset.artist] || ['Описание пока не добавлено.'];
+    aTitle.textContent = chip.textContent.trim();           // заголовок = текст плашки
+    aText.replaceChildren(...paras.map(t => Object.assign(document.createElement('p'), {textContent:t})));
+    lastChip = chip;
+    aModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    $('artistClose').focus();
+  }
+  function closeArtist(){
+    aModal.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastChip) lastChip.focus();
+  }
+  document.querySelectorAll('.musiccard').forEach(chip => {
+    chip.onclick = e => { e.preventDefault(); openArtist(chip); };
+    chip.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openArtist(chip); } };
+  });
+  $('artistClose').onclick = closeArtist;
+  aModal.onclick = e => { if (e.target === aModal) closeArtist(); };
+  addEventListener('keydown', e => { if (e.key === 'Escape' && aModal.classList.contains('open')) closeArtist(); });
   /* Мерцающие полумесяцы, медленно дрейфующие по экрану */
   (function(){
     const cv = $('sky'), ctx = cv.getContext('2d');
@@ -350,6 +439,58 @@ evs.forEach(e => addEventListener(e, unlock));
     }
     addEventListener('resize', () => { resize(); if (still) draw(0); });
     resize(); draw(0);
+  })();
+  /* Падающий снег сверху экрана */
+  (function(){
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv = $('snow'), ctx = cv.getContext('2d');
+    let W, H, dpr, flakes = [], last = 0;
+
+    /* мягкая снежинка-точка */
+    const spr = document.createElement('canvas'); spr.width = spr.height = 32;
+    const g = spr.getContext('2d'), grad = g.createRadialGradient(16,16,0,16,16,16);
+    grad.addColorStop(0,'rgba(255,255,255,1)');
+    grad.addColorStop(.45,'rgba(235,242,255,.7)');
+    grad.addColorStop(1,'rgba(235,242,255,0)');
+    g.fillStyle = grad; g.fillRect(0,0,32,32);
+
+    function spawn(anywhere){
+      const z = Math.random();                       // «глубина»: мелкие — дальше и медленнее
+      return {
+        x: Math.random()*W,
+        y: anywhere ? Math.random()*H : -10 - Math.random()*40,
+        r: 1.5 + z*3.5,
+        vy: .35 + z*1.1,
+        sw: 10 + Math.random()*25,                   // размах покачивания
+        ph: Math.random()*Math.PI*2,
+        sp: .4 + Math.random()*.8,
+        a: .35 + z*.55
+      };
+    }
+    function resize(){
+      dpr = Math.min(devicePixelRatio||1, 2);
+      W = innerWidth; H = innerHeight;
+      cv.width = W*dpr; cv.height = H*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      const n = Math.max(45, Math.min(130, Math.round(W/12)));
+      while (flakes.length < n) flakes.push(spawn(true));
+      flakes.length = n;
+    }
+    function draw(t){
+      const dt = Math.min(t - last, 50)/16.67 || 1; last = t;
+      ctx.clearRect(0,0,W,H);
+      for (const f of flakes){
+        f.y += f.vy*dt;
+        const x = f.x + Math.sin(t*.001*f.sp + f.ph)*f.sw;
+        if (f.y > H + 10){ Object.assign(f, spawn(false)); }
+        ctx.globalAlpha = f.a;
+        ctx.drawImage(spr, x - f.r*2, f.y - f.r*2, f.r*4, f.r*4);
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+    addEventListener('resize', resize);
+    resize(); requestAnimationFrame(draw);
   })();
 </script>
 </body>
